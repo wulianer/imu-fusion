@@ -38,12 +38,12 @@ class State(ABC):
 
 
 class KinematicState(State):
-  """A simple 1D kinematic state with constant acceleration.
+  """A simple 3D kinematic state with constant acceleration.
   """
   def __init__(self, pos, vel, acc):
-    self.pos = pos
-    self.vel = vel 
-    self.acc = acc
+    self.pos = np.asarray(pos)
+    self.vel = np.asarray(vel)
+    self.acc = np.asarray(acc)
 
   def __repr__(self):
     s = "[p: {:.2f}, v: {:.2f}, a: {:2f}]"
@@ -76,4 +76,4 @@ class KinematicState(State):
     # we assume constant acceleration
     # thus the value of the current timestep
     # is ignored
-    return self.__class__(self.vel, self.acc, 0)
+    return self.__class__(self.vel, self.acc, np.zeros(3))

@@ -17,12 +17,12 @@ class Integrator(ABC):
 class Euler(Integrator):
   """Euler's method integrator.
   """
-  def integrate(self, state, t, dt, dsdt=None):
+  def integrate(self, state, t, dt, grad=None):
     """Extrapolates value at `t+dt` using the gradient at `t`.
     """
-    if dsdt is None:
-      dsdt = state.dsdt(t)
-    next_state = state + dt * dsdt
+    if grad is None:
+      grad = state.grad(t)
+    next_state = state + dt * grad
     return next_state
 
 
@@ -32,17 +32,17 @@ class RK4(Integrator):
   def __init__(self):
     self.euler = Euler()
 
-  def _evaluate(self, state, t, dt, dsdt):
+  def _evaluate(self, state, t, dt, grad):
     """Advances the state using Euler's method and computes the gradient at that state.
     """
-    next_state = self.euler.integrate(state, t, dt, dsdt)
-    return next_state.dsdt(t + dt)
+    next_state = self.euler.integrate(state, t, dt, grad)
+    return next_state.grad(t + dt)
 
   def integrate(self, state, t, dt):
     k1 = self._evaluate(state, t, 0, None)
     k2 = self._evaluate(state, t, dt/2, k1)
     k3 = self._evaluate(state, t, dt/2, k2)
     k4 = self._evaluate(state, t, dt, k3)
-    m = (1 / 6) * (k1 + 2*k2 + 2*k3 + k4)
-    next_state = state + m*dt
+    grad = (k1 + 2*k2 + 2*k3 + k4) / 6
+    next_state = state + dt * grad
     return next_state

@@ -28,3 +28,5 @@ if __name__ == "__main__":
 
   actual = 0.5 * acc * 10**2
   print("True position at t=10: {}".format(actual))
+
+  assert np.allclose(actual, state.pos)

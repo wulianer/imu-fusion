@@ -10,44 +10,35 @@ class State(ABC):
     pass
 
   @abstractmethod
-  def dsdt(self, t):
-    """Describes how the state variables change over a very small time delta.
-
-    In other words, computes the gradient of the state variables wrt time.
+  def grad(self, t):
+    """Describes how state variables change over a very small time delta.
 
     Args:
       t (float): The current timestep.
 
     Returns:
-      dsdt (object): a state containing the gradient of each state variable
-        with respect to time.
+      grad (object): the gradient of each state variable
+        with respect to time, evaluated at the given
+        timestep `t`.
     """
     pass
 
   @abstractmethod
   def __add__(self, other):
-    """Defines how a state delta (dsdt) is added to the current state.
-    """
     pass
 
   @abstractmethod
   def __mul__(self, other):
-    """Defines how a state is multiplied by a scalar value.
-    """
     pass
 
 
 class KinematicState(State):
-  """A simple 3D kinematic state with constant acceleration.
+  """A simple kinematic state with constant acceleration.
   """
   def __init__(self, pos, vel, acc):
     self.pos = np.asarray(pos)
     self.vel = np.asarray(vel)
     self.acc = np.asarray(acc)
-
-  def __repr__(self):
-    s = "[p: {:.2f}, v: {:.2f}, a: {:2f}]"
-    return s.format(self.pos, self.vel, self.acc)
 
   def __add__(self, other):
     if isinstance(other, KinematicState):
@@ -72,7 +63,13 @@ class KinematicState(State):
   def __rmul__(self, other):
     return self * other
 
-  def dsdt(self, t):
+  def __truediv__(self, other):
+    if isinstance(other, (int, float)):
+      return (1 / other) * self
+    else:
+      raise NotImplemented
+
+  def grad(self, t):
     # we assume constant acceleration
     # thus the value of the current timestep
     # is ignored

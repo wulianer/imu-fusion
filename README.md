@@ -1,4 +1,4 @@
-# learn-filters
+# imu-fusion
 
 The goal of this repo is to get familiar with filters in the context of state estimation (e.g. sensor fusion). I'm going to be implementing the following filters:
 

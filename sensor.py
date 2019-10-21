@@ -2,36 +2,75 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from walle.core import Pose
+
+
+class Sensor(ABC):
+  """A sensor maps an underlying hidden state to a noisy measurement.
+  """
+  def __init__(self, pose=Pose()):
+    """Initialies the sensor.
+
+    Args:
+      pose (Pose): The pose of the sensor wrt the local coordinate
+        frame.
+    """
+    self.pose = pose
+
+  @abstractmethod
+  def measure(self, state):
+    """Returns the true value of the given state.
+
+    Args:
+      state (State): the underlying state of the system.
+    """
+    pass
+
+  @abstractmethod
+  def corrupt(self, state):
+    """Generates stochastic noise according to the characteristic of the sensor.
+
+    Args:
+      state (State): the underlying state of the system.
+    """
+    pass
+
+  def simulate(self, state):
+    """Returns a stochastic measurement of the given state. 
+
+    Args:
+      state (State): the underlying state of the system.
+    """
+    return self.measure(state) + self.corrupt(state)
+
+
+class WhiteNoiseSensor(Sensor):
+  """A noisy sensor with additive Gaussian noise.
+  """
+  def __init__(self, cov, *args):
+    """Initializes the noisy sensor.
+
+    Args:
+      cov (ndarray): the noise covariance matrix of shape (, ).
+    """
+    super().__init__(args)
+    self.cov = cov
+
+  def corrupt(self, state):
+    return np.random.multivariate_normal(np.zeros(3), self.cov)
+
 
 class Accelerometer:
-  """An accelerometer measures specific force.
+  """An accelerometer measures the specific force f.
   """
-  def __init__(self):
-    pass
-
-  def measure(self):
-    # f = R @ (a - g)
-
-  def simulate(self):
-    pass
+  pass
 
 
 class Gyroscope:
-  """A gyroscope measures angular velocity.
+  """A gyroscope measures the angular velocity w.
   """
-  def __int__(self):
-    pass
-
-  def measure(self):
-    """Measures the angular velocity of the body frame wrt intertial frame
-    expressed in body frame.
-    """
-    # assume navigation frame is stationary => w_en = 0
-    # w_ib = R @ w_ie + w_nb
+  pass
 
 
 class Magnetometer:
-  def __init__(self):
-    pass
-
-
+  pass
